@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Blocks">
+<meta name="theme-color" content="#101420">
+<title>Blocks</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="score" id="score">0</div>
+    <div class="combo" id="combo"></div>
+  </div>
+  <div class="best">
+    Best this session<br><b id="best">0</b>
+    <br>All time<br><b id="allBest">0</b>
+  </div>
+</header>
+
+<div id="boardWrap"><div id="board"></div></div>
+
+<div id="tray"></div>
+
+<footer>
+  <button id="reroll">New pieces (3)</button>
+  <button id="restart">Start over</button>
+  <button id="mute" class="icon" aria-pressed="false" aria-label="Mute sound and vibration">&#128266;</button>
+</footer>
+
+<div id="float" hidden></div>
+
+<div id="over">
+  <h2>No moves left</h2>
+  <div class="final" id="finalScore">0</div>
+  <p id="finalNote"></p>
+  <button id="again">Play again</button>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
