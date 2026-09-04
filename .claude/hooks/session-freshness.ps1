@@ -24,7 +24,24 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
 try {
-    $root = $env:CLAUDE_PROJECT_DIR
+    # Resolve the directory the SESSION is actually in, not where it was launched.
+    # Per the worktrees doc: "Hook paths don't follow the worktree. ${CLAUDE_PROJECT_DIR}
+    # stays put... cwd follows Claude." In a `claude -w <name>` session this hook would
+    # otherwise check the MAIN checkout and report it as current while the worktree the
+    # session is really in went unchecked - a freshness guard that silently guards the
+    # wrong directory is worse than none. The hook's stdin JSON carries the real cwd.
+    # Guarded by IsInputRedirected so a hook invoked without stdin can never block startup.
+    $root = $null
+    try {
+        if ([Console]::IsInputRedirected) {
+            $raw = [Console]::In.ReadToEnd()
+            if ($raw) {
+                $j = $raw | ConvertFrom-Json
+                if ($j.cwd) { $root = [string]$j.cwd }
+            }
+        }
+    } catch { }
+    if (-not $root) { $root = $env:CLAUDE_PROJECT_DIR }
     if (-not $root) { $root = (Get-Location).Path }
     Push-Location $root
     if ((git rev-parse --is-inside-work-tree 2>$null) -ne 'true') { Pop-Location; exit 0 }

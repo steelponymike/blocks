@@ -7,8 +7,26 @@
 # 794 lines without registering that it had only part of the file.
 # NOTE: keep this file pure ASCII - PowerShell 5.1 misparses non-ASCII in BOM-less files.
 $ErrorActionPreference = 'SilentlyContinue'
-$root = $env:CLAUDE_PROJECT_DIR
+
+# Resolve the directory the SESSION is actually in, not where it was launched.
+# Per the worktrees doc: "Hook paths don't follow the worktree. ${CLAUDE_PROJECT_DIR} stays
+# put... cwd follows Claude." So in a `claude -w <name>` session, CLAUDE_PROJECT_DIR still
+# points at the MAIN checkout - injecting its STATUS.md would hand the session the wrong
+# branch's file and say nothing about it. The hook's stdin JSON carries the real cwd.
+# Guarded by IsInputRedirected so a hook invoked without stdin can never block session start.
+$root = $null
+try {
+    if ([Console]::IsInputRedirected) {
+        $raw = [Console]::In.ReadToEnd()
+        if ($raw) {
+            $j = $raw | ConvertFrom-Json
+            if ($j.cwd) { $root = [string]$j.cwd }
+        }
+    }
+} catch { }
+if (-not $root) { $root = $env:CLAUDE_PROJECT_DIR }
 if (-not $root) { $root = (Get-Location).Path }
+
 $p = Join-Path $root 'memory/STATUS.md'
 # Roughly where this file stops fitting in a single Read (25k-token cap). Tune if that moves.
 $readLimitBytes = 45000
