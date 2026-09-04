@@ -1,0 +1,5 @@
+
+# CHANGELOG is append-only, newest at top: keep both sides on a merge instead of
+# conflicting. NOT for STATUS.md, which is edited in place -- union would silently
+# duplicate and reorder it with no conflict warning.
+memory/CHANGELOG.md merge=union
